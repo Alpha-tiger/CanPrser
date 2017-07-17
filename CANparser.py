@@ -371,23 +371,6 @@ def checkenginestate(value):
 
 #C:\\Users\\thomas\\Documents\\Workspace Tom\\HEMS\\OLY-GEP-165K-2011.csv
 
-#Requirement for the CSV files
-#Convert log file to text file
-#remove all headers from text file
-#import into excel from text file
-# delete colums A to G
-# delete B and C
-# delete files from J onwards
-
-#with open('C:\\Users\\thomas\\Documents\\Workspace Tom\\HEMS\\CAT-C18-700K-2015.csv', newline='') as csvfile:
-#    spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
-#    for row in spamreader:
-#            data=''.join(row[0].split()) +","
-
-#            data = data + row[1].zfill(2)+ row[2].zfill(2)+ row[3].zfill(2)+row[4].zfill(2)+row[5].zfill(2)+ row[6].zfill(2)+ row[7].zfill(2)+row[8].zfill(2)
-#            with open("CANRaw.txt", "a") as text_file:
-#                print (data,file=text_file)
-#                parseJ1939(data)
 
 
 file = open('C:\\Users\\thomas\\Documents\\Workspace Tom\\HEMS\\CAT=3412-900K-20140123.txt', 'r', errors='replace')
