@@ -39,11 +39,16 @@ def parseJ1939(rawdata,filename):
     # first 8 characters are the header containing PGN
     # 9th character is the comma
     # 10th character onwards containg the SPN data
-
-    Header = data[0:8]
-    Values = data[9:]
-    #print("Header(PGN) : {}".format(Header))
-    #print("Values(SPN) : {}".format(Values))
+    rawcontent=data.split(',')
+    #print(rawcontent)
+    Line = rawcontent [0]
+    Timestamp = rawcontent[1]
+    Header = rawcontent[2]
+    Values = rawcontent[3]
+    print("Header(PGN) : {}".format(Header))
+    print("Values(SPN) : {}".format(Values))
+    print("Line Number : {}".format(Line))
+    print("Time : {}".format(Timestamp))
 
     # separate the bytes
     b1 = Values[0:2]
@@ -291,7 +296,7 @@ def parseJ1939(rawdata,filename):
                         print("PGN in hex is {0} in decimal {1}, not found".format(PGN,int(PGN,16)),file=text_file)
             else :
              if (int(PGN, 16)):
-                print ("PGN {} Not found, values are ".format(int(data[3:7],16)),Values,file=text_file)
+                print ("PGN {} Not found, values are ".format(int(Header[2:6],16)),Values,file=text_file)
     return;
 
 def log2file(text):
@@ -397,9 +402,9 @@ for filename in os.listdir(LogFilesDir):
                 if (len(splitline)>2) and splitline[0].isdigit():
                     #print (splitline)
                     with open(ParsedFilesDir+"\\"+filename+"Raw.txt", "a") as text_file:
-                        data = splitline[7]+","+splitline[10]+splitline[11]+splitline[12]+splitline[13]+splitline[14]+splitline[15]+splitline[16]+splitline[17]
+                        data = splitline[0]+","+splitline[2]+","+splitline[7]+","+splitline[10]+splitline[11]+splitline[12]+splitline[13]+splitline[14]+splitline[15]+splitline[16]+splitline[17]
                         print(data, file=text_file)
                         parseJ1939(data,filename)
             lno = lno+1
     except  Exception:
-        print (filename +" could not be parsed")
+       print (filename +" could not be parsed")
