@@ -24,6 +24,9 @@ class parser_summary:
     engmanifoldpressure_value = []
     engmanifoldpressure_timestamp = []
 
+    #engine fuel rate
+    fulerate_value = []
+    fulerate_timestamp = []
 
     pgn_list = []
 
@@ -37,8 +40,8 @@ class parser_summary:
 
     def add_speed (self,speed,timestamp):
 
-        if(len(self.speed_timestamp)>0 and timestamp == self.speed_timestamp[-1]) :
-            print('skipping timestamp same')
+        if  (len(self.speed_timestamp)>0 and timestamp == self.speed_timestamp[-1]) :
+            pass
         else:
             self.speed_value.append(speed)
             self.speed_timestamp.append(timestamp)
@@ -46,7 +49,7 @@ class parser_summary:
     def add_engoilpressure (self,value,timestamp):
 
         if (len(self.engoilpressure_value) > 0 and timestamp == self.engoilpressure_timestamp[-1]):
-            print('skipping timestamp same')
+            pass
         else:
             self.engoilpressure_value.append(value)
             self.engoilpressure_timestamp.append(timestamp)
@@ -54,7 +57,7 @@ class parser_summary:
     def add_engcoolanttemp (self,value,timestamp):
 
         if (len(self.engcoolanttemp_value) > 0 and timestamp == self.engcoolanttemp_timestamp[-1]):
-            print('skipping timestamp same')
+            pass
         else:
             self.engcoolanttemp_value.append(value)
             self.engcoolanttemp_timestamp.append(timestamp)
@@ -62,7 +65,7 @@ class parser_summary:
     def add_engmanifoldpressure (self,value,timestamp):
 
         if (len(self.engmanifoldpressure_value) > 0 and timestamp == self.engmanifoldpressure_timestamp[-1]):
-            print('skipping timestamp same')
+            pass
         else:
             self.engmanifoldpressure_value.append(value)
             self.engmanifoldpressure_timestamp.append(timestamp)
@@ -70,14 +73,22 @@ class parser_summary:
     def add_engmanifoldtemperature (self,value,timestamp):
 
         if (len(self.engmanifoldtemperature_value) > 0 and timestamp == self.engmanifoldtemperature_timestamp[-1]):
-            print('skipping timestamp same')
+            pass
         else:
             self.engmanifoldtemperature_value.append(value)
             self.engmanifoldtemperature_timestamp.append(timestamp)
 
+    def add_fulerate(self,value,timestamp):
+
+        if (len(self.fulerate_value) > 0 and timestamp == self.fulerate_timestamp[-1]):
+            pass
+        else:
+            self.fulerate_value.append(value)
+            self.fulerate_timestamp.append(timestamp)
+
     def plot_graph(self):
         print ("reached plot graph")
-
+        currentWorkingDir = os.getcwd()
         print("speed data")
         print (len(self.speed_value))
         print(len(self.speed_timestamp))
@@ -85,7 +96,8 @@ class parser_summary:
         line_chart.title = "Generator - Speed vs Time"
         line_chart.x_labels = self.speed_timestamp
         line_chart.add('Speed',self.speed_value)
-        line_chart.render_in_browser()
+        line_chart.render_to_file(currentWorkingDir+'/ChartFiles/'+self.instance_filename+'Speed.svg')
+
 
         print("ENG PRESSURE data")
         print (len(self.engoilpressure_value))
@@ -94,7 +106,7 @@ class parser_summary:
         line_chart2.title = "Generator - EngOilPressure vs Time"
         line_chart2.x_labels = self.engoilpressure_timestamp
         line_chart2.add('Engine Oil Pressure', self.engoilpressure_value)
-        line_chart2.render_in_browser()
+        line_chart2.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'EngPressure.svg')
 
 
         print("ENG coolant data")
@@ -104,7 +116,7 @@ class parser_summary:
         line_chart3.title = "Generator - EngCoolantTemp vs Time"
         line_chart3.x_labels = self.engcoolanttemp_timestamp
         line_chart3.add('Engine Coolant Temp', self.engcoolanttemp_value)
-        line_chart3.render_in_browser()
+        line_chart3.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'EngCoolant.svg')
 
         print("ENG manifold temp data")
         print (len(self.engmanifoldtemperature_timestamp))
@@ -114,7 +126,18 @@ class parser_summary:
         line_chart4.x_labels = self.engmanifoldtemperature_timestamp
         line_chart4.add('Engine Manifold Temp', self.engmanifoldtemperature_value)
         line_chart4.add('Engine Manifold Pressure', self.engmanifoldpressure_value)
-        line_chart4.render_in_browser()
+        line_chart4.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'Manifold.svg')
+
+        print("Fuel rate data")
+        print(len(self.fulerate_timestamp))
+        print(len(self.fulerate_value))
+        line_chart5 = pygal.Line()
+        line_chart5.title = "Generator - FuelRate vs Time"
+        line_chart5.x_labels = self.fulerate_timestamp
+        line_chart5.add('Engine Fuel Rate', self.fulerate_value)
+        line_chart5.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'FuelRate.svg')
+
+
 
 
         print("PGN List : {}".format(self.pgn_list))
@@ -456,9 +479,12 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         print("SPN-52,Engine Throttle Position :{}".format(EngThrottlePosition),file=text_file)
                         temp.setpgnspn(65266, 52)
                     if (b1 != 'FF'):
-                        EngFuelRate = int(b2+b1, 16)
-                        print("SPN-183,Engine Fuel Rate :{}".format(EngFuelRate),file=text_file)
+                        t = int(b2+b1, 16)
+                        EngFuelRate = (t * 0.05)
+                        print("SPN-183,Engine Fuel Rate :{} L/hr".format(EngFuelRate),file=text_file)
+                        temp.add_fulerate(EngFuelRate,Timestamp)
                         temp.setpgnspn(65266, 183)
+
                     if (b3 != 'FF'):
                         EngInstantFE = int(b4+b3, 16)
                         print("SPN-184,Engine Instantaneous Fuel Economy :{}".format(EngInstantFE),file=text_file)
@@ -590,21 +616,31 @@ LogFilesDir = currentWorkingDir + "\\CanLogFiles"
 # location to where the parsed files should be placed
 ParsedFilesDir = currentWorkingDir + "\\Parsed"
 
+
+
+# location to where the parsed files should be placed
+ChartFilesDir = currentWorkingDir + "\\ChartFiles"
+
 #create a parsed Dir to place the file in
 if not os.path.exists(ParsedFilesDir):
     os.makedirs(ParsedFilesDir)
+
+#create a chart Dir to place images of parsed data
+if not os.path.exists(ChartFilesDir):
+    os.makedirs(ChartFilesDir)
 
 
 # iterate through all the files
 
 for filename in os.listdir(LogFilesDir):
-    #try:
+    try:
 
         file = open(LogFilesDir+"\\"+filename, 'r', errors='replace')
         #lno is used to keep the line numbers
         newfile_flag=1
         print('New file')
-        temp = parser_summary('trial')
+        filename=filename.split('.')
+        temp = parser_summary(filename[0])
         lno=0
         for line in file:
             if lno>0 :
@@ -612,13 +648,13 @@ for filename in os.listdir(LogFilesDir):
                 splitline = spaceremovedline.split("\t")
                 if (len(splitline)>2) and splitline[0].isdigit():
                     #print (splitline)
-                    with open(ParsedFilesDir+"\\"+filename+"Raw.txt", "a") as text_file:
+                    with open(ParsedFilesDir+"\\"+filename[0]+"Raw.txt", "a") as text_file:
                         data = splitline[0]+","+splitline[2]+","+splitline[7]+","+splitline[10]+splitline[11]+splitline[12]+splitline[13]+splitline[14]+splitline[15]+splitline[16]+splitline[17]
                         print(data, file=text_file)
                         #newfile = 1 Indicates a new canlog file has been opened for parsing.
-                        parseJ1939(data,filename,newfile_flag,temp)
+                        parseJ1939(data,filename[0],newfile_flag,temp)
             lno = lno+1
             newfile_flag=0
         temp.plot_graph()
-    #except  Exception:
-    #   print (filename +" could not be parsed")
+    except  Exception:
+       print (filename +" could not be parsed")
