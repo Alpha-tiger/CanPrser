@@ -1,4 +1,51 @@
 import os,subprocess
+import pygal
+
+class parser_summary:
+    instance_filename = 'empty'
+
+    #speed list to store speed and timestamp
+    speed_timestamp = []
+    speed_value = []
+
+
+    pgn_list = set()
+
+    spn_list = set()
+
+    def __init__(self,filename):
+        self.instance_filename = filename
+        self.speed =[]
+        self.pgn_list = set()
+        self.spn_list = set()
+
+    def add_speed (self,speed,timestamp):
+
+        if(len(self.speed_timestamp)>0 and timestamp == self.speed_timestamp[-1]) :
+            print('skipping timestamp same')
+        else:
+            self.speed_value.append(speed)
+            self.speed_timestamp.append(timestamp)
+
+
+    def plot_graph(self):
+        print ("reached plot graph")
+        print (self.speed_timestamp)
+        print (self.speed_value)
+        line_chart = pygal.Line()
+        line_chart.title = "Generator - Speed vs Time"
+        line_chart.x_labels = self.speed_timestamp
+        line_chart.add('Speed',self.speed_value)
+        line_chart.render_in_browser()
+
+    def readfilename(self):
+        return self.instance_filename
+
+
+    def setpgnspn(self,pgn,spn):
+        self.pgn_list = set(pgn)
+        self.spn_list = set(spn)
+
 
 #creating a library to store all PGN numbers
 
@@ -32,7 +79,10 @@ J1939 = {64914: "Engine Operating Information",
          }
 
 
-def parseJ1939(rawdata,filename):
+def parseJ1939(rawdata,filename,newfile_flag,temp):
+
+
+
     # function to parse the raw data
     # function expects data to be <PGN(0-8),(9)b1(10-11)b2(12-13)b3(14-15)b4(16-17)b5(18-19)b6(20-21)b7(22-23)b8(24-25)> format
     data = ''.join(rawdata.split())
@@ -122,6 +172,7 @@ def parseJ1939(rawdata,filename):
                     if (b5 != 'FF'):
                         EngineSpeed= int(b5+b4,16)* 0.125
                         print("SPN-190,Engine Speed :{}".format(EngineSpeed),file=text_file)
+                        temp.add_speed(EngineSpeed,Timestamp)
                     if (b3 != 'FF'):
                         ActualEnginePT = int(b3,16) - 125
                         print("SPN-513,Actual Engine Percentage Torque :{}".format(ActualEnginePT),file=text_file)
@@ -391,9 +442,13 @@ if not os.path.exists(ParsedFilesDir):
 # iterate through all the files
 
 for filename in os.listdir(LogFilesDir):
-    try:
+    #try:
 
         file = open(LogFilesDir+"\\"+filename, 'r', errors='replace')
+        #lno is used to keep the line numbers
+        newfile_flag=1
+        print('New file')
+        temp = parser_summary('trial')
         lno=0
         for line in file:
             if lno>0 :
@@ -404,7 +459,10 @@ for filename in os.listdir(LogFilesDir):
                     with open(ParsedFilesDir+"\\"+filename+"Raw.txt", "a") as text_file:
                         data = splitline[0]+","+splitline[2]+","+splitline[7]+","+splitline[10]+splitline[11]+splitline[12]+splitline[13]+splitline[14]+splitline[15]+splitline[16]+splitline[17]
                         print(data, file=text_file)
-                        parseJ1939(data,filename)
+                        #newfile = 1 Indicates a new canlog file has been opened for parsing.
+                        parseJ1939(data,filename,newfile_flag,temp)
             lno = lno+1
-    except  Exception:
-       print (filename +" could not be parsed")
+            newfile_flag=0
+        temp.plot_graph()
+    #except  Exception:
+    #   print (filename +" could not be parsed")
