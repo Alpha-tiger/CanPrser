@@ -5,42 +5,32 @@ class parser_summary:
     instance_filename = 'empty'
 
     #speed list to store speed and timestamp
-    speed_timestamp = []
-    speed_value = []
 
-    #engine oil pressure and timestamp
-    engoilpressure_value = []
-    engoilpressure_timestamp = []
-
-    #engine coolant temperature
-    engcoolanttemp_value = []
-    engcoolanttemp_timestamp = []
-
-    # engmanifoldtemperature
-    engmanifoldtemperature_value = []
-    engmanifoldtemperature_timestamp = []
-
-    #engmanifoldpressure
-    engmanifoldpressure_value = []
-    engmanifoldpressure_timestamp = []
-
-    #engine fuel rate
-    fulerate_value = []
-    fulerate_timestamp = []
-
-    pgn_list = []
-
-    spn_list = []
 
     def __init__(self,filename):
         self.instance_filename = filename
-        self.speed =[]
         self.pgn_list = []
         self.spn_list = []
+        self.speed_timestamp = []
+        self.speed_value = []
+        self.engoilpressure_value = []
+        self.engoilpressure_timestamp = []
+        self.engcoolanttemp_value = []
+        self.engcoolanttemp_timestamp = []
+        self.engmanifoldtemperature_value = []
+        self.engmanifoldtemperature_timestamp = []
+        self.engmanifoldpressure_value = []
+        self.engmanifoldpressure_timestamp = []
+        self.fulerate_value = []
+        self.fulerate_timestamp = []
+        self.pgn_byte_list = []
+        self.pgn_list = []
+        self.spn_list = []
+        self.set_pgnlist = []
 
     def add_speed (self,speed,timestamp):
 
-        if  (len(self.speed_timestamp)>0 and timestamp == self.speed_timestamp[-1]) :
+        if  len(self.speed_timestamp)>0 and timestamp == self.speed_timestamp[-1] :
             pass
         else:
             self.speed_value.append(speed)
@@ -48,7 +38,7 @@ class parser_summary:
 
     def add_engoilpressure (self,value,timestamp):
 
-        if (len(self.engoilpressure_value) > 0 and timestamp == self.engoilpressure_timestamp[-1]):
+        if len(self.engoilpressure_value) > 0 and timestamp == self.engoilpressure_timestamp[-1]:
             pass
         else:
             self.engoilpressure_value.append(value)
@@ -56,7 +46,7 @@ class parser_summary:
 
     def add_engcoolanttemp (self,value,timestamp):
 
-        if (len(self.engcoolanttemp_value) > 0 and timestamp == self.engcoolanttemp_timestamp[-1]):
+        if len(self.engcoolanttemp_value) > 0 and timestamp == self.engcoolanttemp_timestamp[-1]:
             pass
         else:
             self.engcoolanttemp_value.append(value)
@@ -64,7 +54,7 @@ class parser_summary:
 
     def add_engmanifoldpressure (self,value,timestamp):
 
-        if (len(self.engmanifoldpressure_value) > 0 and timestamp == self.engmanifoldpressure_timestamp[-1]):
+        if len(self.engmanifoldpressure_value) > 0 and timestamp == self.engmanifoldpressure_timestamp[-1]:
             pass
         else:
             self.engmanifoldpressure_value.append(value)
@@ -72,7 +62,7 @@ class parser_summary:
 
     def add_engmanifoldtemperature (self,value,timestamp):
 
-        if (len(self.engmanifoldtemperature_value) > 0 and timestamp == self.engmanifoldtemperature_timestamp[-1]):
+        if len(self.engmanifoldtemperature_value) > 0 and timestamp == self.engmanifoldtemperature_timestamp[-1]:
             pass
         else:
             self.engmanifoldtemperature_value.append(value)
@@ -80,7 +70,7 @@ class parser_summary:
 
     def add_fulerate(self,value,timestamp):
 
-        if (len(self.fulerate_value) > 0 and timestamp == self.fulerate_timestamp[-1]):
+        if len(self.fulerate_value) > 0 and timestamp == self.fulerate_timestamp[-1]:
             pass
         else:
             self.fulerate_value.append(value)
@@ -139,9 +129,14 @@ class parser_summary:
 
 
 
+        self.set_pgnlist = set(self.pgn_list)
+        print("PGN List : {}".format(self.set_pgnlist))
+        for i in self.set_pgnlist:
+            print ("{} occurs {} times".format(i,self.pgn_list.count(i)))
 
-        print("PGN List : {}".format(self.pgn_list))
-        print(" SPN List : {}".format(self.spn_list))
+        print("PGN and associated byte changes {}".format(set(self.pgn_byte_list)))
+
+        print(" SPN List : {}".format(set(self.spn_list)))
 
     def readfilename(self):
         return self.instance_filename
@@ -149,16 +144,49 @@ class parser_summary:
 
     def setpgnspn(self,pgn,spn):
 
-        if pgn not in self.pgn_list:
-            self.pgn_list.append(pgn)
+        self.pgn_list.append(pgn)
 
-        if spn not in self.spn_list:
-            self.spn_list.append(spn)
+        self.spn_list.append(spn)
 
+    def pgndataidentifier (self,PGN,b1,b2,b3,b4,b5,b6,b7,b8):
 
+        hb1 = '0'
+        hb2 = '0'
+        hb3 = '0'
+        hb4 = '0'
+        hb5 = '0'
+        hb6 = '0'
+        hb7 = '0'
+        hb8 = '0'
+        pgn = str(PGN)
+
+        if b1 != 'FF':
+            hb1 = '1'
+
+        if b2 != 'FF':
+            hb2 = '1'
+
+        if b3 != 'FF':
+            hb3 = '1'
+
+        if b4 != 'FF':
+            hb4 = '1'
+
+        if b5 != 'FF':
+            hb5 = '1'
+
+        if b6 != 'FF':
+            hb6 = '1'
+
+        if b7 != 'FF':
+            hb7 = '1'
+
+        if b8 != 'FF':
+            hb8 = '1'
+
+        self.pgn_byte_list.append("PGN-{},{}{}{}{}{}{}{}{}".format(pgn,hb1,hb2,hb3,hb4,hb5,hb6,hb7,hb8))
 
 #creating a library to store all PGN numbers
-
 J1939 = dict()
 J1939.keys()
 J1939 = {64914: "Engine Operating Information",
@@ -220,6 +248,14 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
     b7 = Values[12:14]
     b8 = Values[14:16]
 
+    # source address value
+    SA = Header[6:]
+    # PGN (Parameter Group Number) value
+    PGN = Header[3:7]
+
+    temp.pgndataidentifier(int(PGN,16),b1,b2,b3,b4,b5,b6,b7,b8)
+
+
     # The value of certain fields are encoded in bytes , each data passed along a Can bus message has 8 bytes and depending on the SPN the values are in these 8 bytes
     # Data bytesthat are not available and are set to 0xFF. No raw parameter value (single byte) could have the value 0xFF.
     # When Data bytes have 2 bytes for value, The first byte is the least significant (Intel byte order). E.G.
@@ -228,11 +264,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
 
     with open(ParsedFilesDir+"\\"+filename+"CANparsed.txt", "a") as text_file:
 
-        # source address value
-        SA = Header[6:]
-        # PGN (Parameter Group Number) value
-        PGN = Header[2:6]
-        #print (PGN)
+
         # check to verify the data is passed along correct
         if PGN.isalnum():
             # checks if the PGN parsed as int is available in the library
@@ -532,12 +564,6 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                 print ("PGN {} Not found, values are ".format(int(Header[2:6],16)),Values,file=text_file)
     return;
 
-def log2file(text):
-
-    with open("CanParserValues.txt", "w") as text_file:
-        text_file.write("Purchase Amount: {0}".format(text))
-
-    return;
 
 def checkstate(value):
 
@@ -633,14 +659,15 @@ if not os.path.exists(ChartFilesDir):
 # iterate through all the files
 
 for filename in os.listdir(LogFilesDir):
-    try:
+    #try:
 
         file = open(LogFilesDir+"\\"+filename, 'r', errors='replace')
         #lno is used to keep the line numbers
         newfile_flag=1
-        print('New file')
+
         filename=filename.split('.')
         temp = parser_summary(filename[0])
+        print('Parsing {}'.format(filename[0]))
         lno=0
         for line in file:
             if lno>0 :
@@ -651,10 +678,11 @@ for filename in os.listdir(LogFilesDir):
                     with open(ParsedFilesDir+"\\"+filename[0]+"Raw.txt", "a") as text_file:
                         data = splitline[0]+","+splitline[2]+","+splitline[7]+","+splitline[10]+splitline[11]+splitline[12]+splitline[13]+splitline[14]+splitline[15]+splitline[16]+splitline[17]
                         print(data, file=text_file)
+                        #print(data)
                         #newfile = 1 Indicates a new canlog file has been opened for parsing.
                         parseJ1939(data,filename[0],newfile_flag,temp)
             lno = lno+1
             newfile_flag=0
         temp.plot_graph()
-    except  Exception:
-       print (filename +" could not be parsed")
+    #except  Exception:
+    #   print (filename[0] +" could not be parsed")
