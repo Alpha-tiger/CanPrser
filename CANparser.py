@@ -127,16 +127,16 @@ class parser_summary:
         line_chart5.add('Engine Fuel Rate', self.fulerate_value)
         line_chart5.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'FuelRate.svg')
 
+        with open(ParsedFilesDir + "\\" + filename[0] + "Analysed.txt", "a") as text_file:
 
+            self.set_pgnlist = set(self.pgn_list)
+            print("PGN List : {}".format(self.set_pgnlist),file=text_file)
+            for i in self.set_pgnlist:
+                print ("{} occurs {} times".format(i,self.pgn_list.count(i)),file=text_file)
 
-        self.set_pgnlist = set(self.pgn_list)
-        print("PGN List : {}".format(self.set_pgnlist))
-        for i in self.set_pgnlist:
-            print ("{} occurs {} times".format(i,self.pgn_list.count(i)))
+            print("PGN and associated byte changes {}".format(set(self.pgn_byte_list)),file=text_file)
 
-        print("PGN and associated byte changes {}".format(set(self.pgn_byte_list)))
-
-        print(" SPN List : {}".format(set(self.spn_list)))
+            print(" SPN List : {}".format(set(self.spn_list)),file=text_file)
 
     def readfilename(self):
         return self.instance_filename
