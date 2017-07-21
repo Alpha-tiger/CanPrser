@@ -77,55 +77,76 @@ class parser_summary:
             self.fulerate_timestamp.append(timestamp)
 
     def plot_graph(self):
+
+        arrangedspeed_value = []
+        arrangedfulerate_value = []
+        arrangedengmanifoldpressure_value = []
+        arrangedengoilpressure_value = []
+        arrangedengcoolanttemp_value = []
+
         print ("reached plot graph")
         currentWorkingDir = os.getcwd()
-        print("speed data")
-        print (len(self.speed_value))
-        print(len(self.speed_timestamp))
+
+        timestamp = set(self.speed_timestamp+self.engcoolanttemp_timestamp+self.engoilpressure_timestamp+self.engmanifoldpressure_timestamp+self.fulerate_timestamp)
+
+        sortedtimestamp = sorted(timestamp)
+
+        cursor=0
+
+        for i in sortedtimestamp:
+            if i in self.speed_timestamp:
+                cursor=self.speed_timestamp.index(i)
+                arrangedspeed_value.append(self.speed_value[cursor])
+            else :
+                arrangedspeed_value.append(None)
+
+            if i in self.engcoolanttemp_timestamp:
+                cursor=self.engcoolanttemp_timestamp.index(i)
+                arrangedengcoolanttemp_value.append(self.engcoolanttemp_value[cursor])
+            else :
+                arrangedengcoolanttemp_value.append(None)
+
+            if i in self.engoilpressure_timestamp:
+                cursor=self.engoilpressure_timestamp.index(i)
+                arrangedengoilpressure_value.append(self.engoilpressure_value[cursor])
+            else :
+                arrangedengoilpressure_value.append(None)
+
+            if i in self.engmanifoldpressure_timestamp:
+                cursor=self.engmanifoldpressure_timestamp.index(i)
+                arrangedengmanifoldpressure_value.append(self.engmanifoldpressure_value[cursor])
+            else :
+                arrangedengmanifoldpressure_value.append(None)
+
+            if i in self.fulerate_timestamp:
+                cursor=self.fulerate_timestamp.index(i)
+                arrangedfulerate_value.append(self.fulerate_value[cursor])
+            else :
+                arrangedfulerate_value.append(None)
+
+
+
+
+
+        print("data vs time")
+        print (arrangedspeed_value)
+        print (arrangedengcoolanttemp_value)
+        print (arrangedengoilpressure_value)
+        print (arrangedengmanifoldpressure_value)
+        print (arrangedfulerate_value)
+        print (len(sortedtimestamp))
         line_chart = pygal.Line()
-        line_chart.title = "Generator - Speed vs Time"
-        line_chart.x_labels = self.speed_timestamp
-        line_chart.add('Speed',self.speed_value)
-        line_chart.render_to_file(currentWorkingDir+'/ChartFiles/'+self.instance_filename+'Speed.svg')
+        line_chart.title = "Generator - Data vs Time"
+        line_chart.x_labels = sortedtimestamp
+        line_chart.add('Speed',arrangedspeed_value)
+        line_chart.add('Eng coolant temp',arrangedengcoolanttemp_value)
+        line_chart.add('Eng Oil Pressure',arrangedengoilpressure_value)
+        line_chart.add('Manifold Pressure',arrangedengmanifoldpressure_value)
+        line_chart.add('Fuel Rate',arrangedfulerate_value)
+
+        line_chart.render_to_file(currentWorkingDir+'/ChartFiles/'+self.instance_filename+'Combined.svg')
 
 
-        print("ENG PRESSURE data")
-        print (len(self.engoilpressure_value))
-        print(len(self.engoilpressure_timestamp))
-        line_chart2 = pygal.Line()
-        line_chart2.title = "Generator - EngOilPressure vs Time"
-        line_chart2.x_labels = self.engoilpressure_timestamp
-        line_chart2.add('Engine Oil Pressure', self.engoilpressure_value)
-        line_chart2.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'EngPressure.svg')
-
-
-        print("ENG coolant data")
-        print (len(self.engcoolanttemp_timestamp))
-        print(len(self.engcoolanttemp_value))
-        line_chart3 = pygal.Line()
-        line_chart3.title = "Generator - EngCoolantTemp vs Time"
-        line_chart3.x_labels = self.engcoolanttemp_timestamp
-        line_chart3.add('Engine Coolant Temp', self.engcoolanttemp_value)
-        line_chart3.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'EngCoolant.svg')
-
-        print("ENG manifold temp data")
-        print (len(self.engmanifoldtemperature_timestamp))
-        print(len(self.engmanifoldtemperature_value))
-        line_chart4 = pygal.Line()
-        line_chart4.title = "Generator - ManifoldTemp vs Time"
-        line_chart4.x_labels = self.engmanifoldtemperature_timestamp
-        line_chart4.add('Engine Manifold Temp', self.engmanifoldtemperature_value)
-        line_chart4.add('Engine Manifold Pressure', self.engmanifoldpressure_value)
-        line_chart4.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'Manifold.svg')
-
-        print("Fuel rate data")
-        print(len(self.fulerate_timestamp))
-        print(len(self.fulerate_value))
-        line_chart5 = pygal.Line()
-        line_chart5.title = "Generator - FuelRate vs Time"
-        line_chart5.x_labels = self.fulerate_timestamp
-        line_chart5.add('Engine Fuel Rate', self.fulerate_value)
-        line_chart5.render_to_file(currentWorkingDir+'/ChartFiles/' + self.instance_filename + 'FuelRate.svg')
 
         with open(ParsedFilesDir + "\\" + filename[0] + "Analysed.txt", "a") as text_file:
 
