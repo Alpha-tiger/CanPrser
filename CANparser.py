@@ -515,7 +515,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         temp.setpgnspn(65270, 2440)
                 elif int(PGN, 16) == 64934:
                     if (b1 != 'FF'):
-                        GenExcitationFV = int(b2+b1, 16)
+                        GenExcitationFV = int(b2+b1, 16) - 3212.75
                         print("SPN-3380,Generator Excitation Field Voltage :{}".format(GenExcitationFV),file=text_file)
                         temp.setpgnspn(64934, 3380)
                     if (b3 != 'FF'):
@@ -576,6 +576,12 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         InstEstBrakePower = int(b8+b7, 16)
                         print("SPN-1242,Instantaneous Estimated Brake Power :{}".format(InstEstBrakePower),file=text_file)
                         temp.setpgnspn(65170, 1242)
+
+                elif int(PGN, 16) == 65253:
+                    if (b1 != 'FF'):
+                        EngineHours = int(b4+b3+b2+b1, 16) * 0.05
+                        print("SPN-247,Engine Air Filter Differential 2 :{}".format(EngineHours),file=text_file)
+                        temp.setpgnspn(64976, 2809)
 
                 else:
                     if (int(PGN,16)):
