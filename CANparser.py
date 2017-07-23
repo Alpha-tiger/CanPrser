@@ -1,6 +1,9 @@
 import os,subprocess
 import pygal
 
+
+totalpgnbytelist = []
+
 class parser_summary:
     instance_filename = 'empty'
 
@@ -324,6 +327,9 @@ class parser_summary:
 
             print(" SPN List : {}".format(set(self.spn_list)),file=text_file)
 
+            for i in self.pgn_byte_list:
+                totalpgnbytelist.append(i)
+
     def readfilename(self):
         return self.instance_filename
 
@@ -371,6 +377,7 @@ class parser_summary:
             hb8 = '1'
 
         self.pgn_byte_list.append("PGN-{},{}{}{}{}{}{}{}{}".format(pgn,hb1,hb2,hb3,hb4,hb5,hb6,hb7,hb8))
+
 
 #creating a library to store all PGN numbers
 J1939 = dict()
@@ -877,7 +884,7 @@ if not os.path.exists(ChartFilesDir):
 # iterate through all the files
 
 for filename in os.listdir(LogFilesDir):
-    #try:
+    try:
 
         file = open(LogFilesDir+"\\"+filename, 'r', errors='replace')
         #lno is used to keep the line numbers
@@ -902,5 +909,6 @@ for filename in os.listdir(LogFilesDir):
             lno = lno+1
             newfile_flag=0
         temp.plot_graph()
-    #except  Exception:
-    #   print (filename[0] +" could not be parsed")
+    except  Exception:
+       print (filename[0] +" could not be parsed")
+print(set(totalpgnbytelist))
