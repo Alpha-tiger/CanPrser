@@ -27,6 +27,26 @@ class parser_summary:
         self.pgn_list = []
         self.spn_list = []
         self.set_pgnlist = []
+        self.GenAvgL2LV = []
+        self.GenAvgL2NV = []
+        self.GenAvgACFrequency = []
+        self.GenAvgACRMS = []
+        self.GenAvgTimestamp = []
+        self.GenPhaseAFrequency = []
+        self.GenPhaseAL2LV = []
+        self.GenPhaseAL2NV = []
+        self.GenPhaseACurrent = []
+        self.GenPhaseATimestamp = []
+        self.GenPhaseBFrequency = []
+        self.GenPhaseBL2LV = []
+        self.GenPhaseBL2NV = []
+        self.GenPhaseBCurrent = []
+        self.GenPhaseBTimestamp = []
+        self.GenPhaseCFrequency = []
+        self.GenPhaseCL2LV = []
+        self.GenPhaseCL2NV = []
+        self.GenPhaseCCurrent = []
+        self.GenPhaseCTimestamp = []
 
     def add_speed (self,speed,timestamp):
 
@@ -76,6 +96,61 @@ class parser_summary:
             self.fulerate_value.append(value)
             self.fulerate_timestamp.append(timestamp)
 
+    def add_GenAvg (self,current,frequency,l2l,l2n,timestamp):
+
+        if len(self.GenAvgTimestamp) > 0 and timestamp == self.GenAvgTimestamp[-1]:
+            pass
+        else:
+            self.GenAvgACFrequency.append(frequency)
+            self.GenAvgACRMS.append(current)
+            self.GenAvgL2LV.append(l2l)
+            self.GenAvgL2NV.append(l2n)
+            self.GenAvgTimestamp.append(timestamp)
+
+    def add_GenAvg (self,current,frequency,l2l,l2n,timestamp):
+
+        if len(self.GenAvgTimestamp) > 0 and timestamp == self.GenAvgTimestamp[-1]:
+            pass
+        else:
+            self.GenAvgACFrequency.append(frequency)
+            self.GenAvgACRMS.append(current)
+            self.GenAvgL2LV.append(l2l)
+            self.GenAvgL2NV.append(l2n)
+            self.GenAvgTimestamp.append(timestamp)
+
+    def add_PhaseA (self,current,frequency,l2l,l2n,timestamp):
+
+        if len(self.GenPhaseATimestamp) > 0 and timestamp == self.GenPhaseATimestamp[-1]:
+            pass
+        else:
+            self.GenPhaseAFrequency.append(frequency)
+            self.GenPhaseACurrent.append(current)
+            self.GenPhaseAL2LV.append(l2l)
+            self.GenPhaseAL2NV.append(l2n)
+            self.GenPhaseATimestamp.append(timestamp)
+
+    def add_PhaseB (self,current,frequency,l2l,l2n,timestamp):
+
+        if len(self.GenPhaseBTimestamp) > 0 and timestamp == self.GenPhaseBTimestamp[-1]:
+            pass
+        else:
+            self.GenPhaseBFrequency.append(frequency)
+            self.GenPhaseBCurrent.append(current)
+            self.GenPhaseBL2LV.append(l2l)
+            self.GenPhaseBL2NV.append(l2n)
+            self.GenPhaseBTimestamp.append(timestamp)
+
+    def add_PhaseC (self,current,frequency,l2l,l2n,timestamp):
+
+        if len(self.GenPhaseCTimestamp) > 0 and timestamp == self.GenPhaseCTimestamp[-1]:
+            pass
+        else:
+            self.GenPhaseCFrequency.append(frequency)
+            self.GenPhaseCCurrent.append(current)
+            self.GenPhaseCL2LV.append(l2l)
+            self.GenPhaseCL2NV.append(l2n)
+            self.GenPhaseCTimestamp.append(timestamp)
+
     def plot_graph(self):
 
         arrangedspeed_value = []
@@ -83,11 +158,31 @@ class parser_summary:
         arrangedengmanifoldpressure_value = []
         arrangedengoilpressure_value = []
         arrangedengcoolanttemp_value = []
+        arrangedGenAvgL2LV = []
+        arrangedGenAvgL2NV = []
+        arrangedGenAvgACFrequency = []
+        arrangedGenAvgACRMS = []
+        arrangedGenPhaseAFrequency = []
+        arrangedGenPhaseAL2LV = []
+        arrangedGenPhaseAL2NV = []
+        arrangedGenPhaseACurrent = []
+        arrangedGenPhaseBFrequency = []
+        arrangedGenPhaseBL2LV = []
+        arrangedGenPhaseBL2NV = []
+        arrangedGenPhaseBCurrent = []
+        arrangedGenPhaseCFrequency = []
+        arrangedGenPhaseCL2LV = []
+        arrangedGenPhaseCL2NV = []
+        arrangedGenPhaseCCurrent = []
+
+
+
+
 
         print ("reached plot graph")
         currentWorkingDir = os.getcwd()
 
-        timestamp = set(self.speed_timestamp+self.engcoolanttemp_timestamp+self.engoilpressure_timestamp+self.engmanifoldpressure_timestamp+self.fulerate_timestamp)
+        timestamp = set(self.speed_timestamp+self.engcoolanttemp_timestamp+self.engoilpressure_timestamp+self.engmanifoldpressure_timestamp+self.fulerate_timestamp+self.GenAvgTimestamp+self.GenPhaseATimestamp+self.GenPhaseBTimestamp+self.GenPhaseCTimestamp)
 
         sortedtimestamp = sorted(timestamp)
 
@@ -124,6 +219,54 @@ class parser_summary:
             else :
                 arrangedfulerate_value.append(None)
 
+            if i in self.GenAvgTimestamp:
+                cursor=self.GenAvgTimestamp.index(i)
+                arrangedGenAvgACFrequency.append(self.GenAvgACFrequency[cursor])
+                arrangedGenAvgACRMS.append(self.GenAvgACRMS[cursor])
+                arrangedGenAvgL2NV.append(self.GenAvgL2NV[cursor])
+                arrangedGenAvgL2LV.append(self.GenAvgL2LV[cursor])
+            else:
+                arrangedGenAvgACFrequency.append(None)
+                arrangedGenAvgACRMS.append(None)
+                arrangedGenAvgL2NV.append(None)
+                arrangedGenAvgL2LV.append(None)
+
+            if i in self.GenPhaseATimestamp:
+                cursor=self.GenPhaseATimestamp.index(i)
+                arrangedGenPhaseAFrequency.append(self.GenPhaseAFrequency[cursor])
+                arrangedGenPhaseACurrent.append(self.GenPhaseACurrent[cursor])
+                arrangedGenPhaseAL2LV.append(self.GenPhaseAL2LV[cursor])
+                arrangedGenPhaseAL2NV.append(self.GenPhaseAL2NV[cursor])
+            else:
+                arrangedGenPhaseAFrequency.append(None)
+                arrangedGenPhaseACurrent.append(None)
+                arrangedGenPhaseAL2LV.append(None)
+                arrangedGenPhaseAL2NV.append(None)
+
+            if i in self.GenPhaseBTimestamp:
+                cursor=self.GenPhaseBTimestamp.index(i)
+                arrangedGenPhaseBFrequency.append(self.GenPhaseBFrequency[cursor])
+                arrangedGenPhaseBCurrent.append(self.GenPhaseBCurrent[cursor])
+                arrangedGenPhaseBL2LV.append(self.GenPhaseBL2LV[cursor])
+                arrangedGenPhaseBL2NV.append(self.GenPhaseBL2NV[cursor])
+            else:
+                arrangedGenPhaseBFrequency.append(None)
+                arrangedGenPhaseBCurrent.append(None)
+                arrangedGenPhaseBL2LV.append(None)
+                arrangedGenPhaseBL2NV.append(None)
+
+            if i in self.GenPhaseCTimestamp:
+                cursor=self.GenPhaseCTimestamp.index(i)
+                arrangedGenPhaseCFrequency.append(self.GenPhaseCFrequency[cursor])
+                arrangedGenPhaseCCurrent.append(self.GenPhaseCCurrent[cursor])
+                arrangedGenPhaseCL2LV.append(self.GenPhaseCL2LV[cursor])
+                arrangedGenPhaseCL2NV.append(self.GenPhaseCL2NV[cursor])
+            else:
+                arrangedGenPhaseCFrequency.append(None)
+                arrangedGenPhaseCCurrent.append(None)
+                arrangedGenPhaseCL2LV.append(None)
+                arrangedGenPhaseCL2NV.append(None)
+
 
 
 
@@ -145,6 +288,28 @@ class parser_summary:
         line_chart.add('Fuel Rate',arrangedfulerate_value)
 
         line_chart.render_to_file(currentWorkingDir+'/ChartFiles/'+self.instance_filename+'Combined.svg')
+
+        line_chart2 = pygal.Line()
+        line_chart2.title = "Generator - Power Data vs Time"
+        line_chart2.x_labels = sortedtimestamp
+        line_chart2.add('Average Frequency', arrangedGenAvgACFrequency)
+        line_chart2.add('Average Current', arrangedGenAvgACRMS)
+        line_chart2.add('Average Line to Line', arrangedGenAvgL2LV)
+        line_chart2.add('Average Line to Neutral', arrangedGenAvgL2NV)
+        line_chart2.add('Phase A Frequency', arrangedGenPhaseAFrequency)
+        line_chart2.add('Phase A Current', arrangedGenPhaseACurrent)
+        line_chart2.add('Phase A Line to Line', arrangedGenPhaseAL2LV)
+        line_chart2.add('Phase A Line to Neutral', arrangedGenPhaseAL2NV)
+        line_chart2.add('Phase B Frequency', arrangedGenPhaseBFrequency)
+        line_chart2.add('Phase B Current', arrangedGenPhaseBCurrent)
+        line_chart2.add('Phase B Line to Line', arrangedGenPhaseBL2LV)
+        line_chart2.add('Phase B Line to Neutral', arrangedGenPhaseBL2NV)
+        line_chart2.add('Phase C Frequency', arrangedGenPhaseCFrequency)
+        line_chart2.add('Phase C Current', arrangedGenPhaseCCurrent)
+        line_chart2.add('Phase C Line to Line', arrangedGenPhaseCL2LV)
+        line_chart2.add('Phase C Line to Neutral', arrangedGenPhaseCL2NV)
+
+        line_chart2.render_to_file(currentWorkingDir + '/ChartFiles/' + self.instance_filename + 'Power.svg')
 
 
 
@@ -234,7 +399,8 @@ J1939 = {64914: "Engine Operating Information",
          65266: "Fuel Economy",
          65247: "Electronic Engine Controller 3",
          65170: "Engine Information",
-         64976: "Inlet / Exhaust Conditions 2"
+         64976: "Inlet / Exhaust Conditions 2",
+         59904: "Request"
          }
 
 
@@ -386,13 +552,15 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         temp.setpgnspn(61443, 174)
                     if (b4 != 'FF'):
                         EngOilTemp = (int((b4+b3), 16) *  0.03125)-273
-                        print("SPN-175,Engine Oil Temperature :{}".format(EngOilTemp),file=text_file)
+                        print("SPN-176,Engine Oil Temperature :{}".format(EngOilTemp),file=text_file)
                         temp.setpgnspn(61443, 175)
                 elif int(PGN, 16) == 65030:
                     if (b6 != 'FF'):
                         GenAvgACFrequency = int(b6 + b5, 16) * 0.0078125
                         print("SPN-2436,Generator Average AC Frequency :{}".format(GenAvgACFrequency),file=text_file)
                         temp.setpgnspn(65030, 2436)
+                    else:
+                        GenAvgACFrequency=None
                     if (b2 != 'FF'):
                         GenAvgL2LV = int(b2+b1,16)
                         print("SPN-2440,Generator Average Line - Line AC RMS Voltage :{}".format(GenAvgL2LV),file=text_file)
@@ -401,10 +569,19 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         GenAvgL2NV = int(b4+b3,16)
                         print("SPN-2440,Generator Average Line - Neutral AC RMS Voltage :{}".format(GenAvgL2NV),file=text_file)
                         temp.setpgnspn(65030, 2440)
+                    if (b8 != 'FF'):
+                        GenAvgACRMS = int(b8 + b7, 16)
+                        print("SPN-2448,Generator Average AC RMS Current :{}".format(GenAvgACRMS),file=text_file)
+                        temp.setpgnspn(65030, 2448)
+
+                        temp.add_GenAvg(GenAvgACRMS,GenAvgACFrequency,GenAvgL2LV,GenAvgL2NV,Timestamp)
+
                 elif int(PGN,16) == 65027:
                     if (b6 != 'FF'):
                         GenPhaseAFrequency = int(b6 + b5, 16) * 0.0078125
                         print("SPN-2437,Generator Phase AC Frequency :{}".format(GenPhaseAFrequency),file=text_file)
+                    else:
+                        GenPhaseAFrequency=None
                         temp.setpgnspn(65027, 2437)
                     if (b2 != 'FF'):
                         GenPhaseAL2LV = int(b2+b1,16)
@@ -418,10 +595,14 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         GenPhaseACurrent = int(b8+b7,16)
                         print("SPN-2449,Generator Phase A AC RMS Current :{}".format(GenPhaseACurrent),file=text_file)
                         temp.setpgnspn(65027, 2449)
+                        temp.add_PhaseA(GenPhaseACurrent,GenPhaseAFrequency,GenPhaseAL2LV,GenPhaseAL2NV,Timestamp)
+
                 elif int(PGN,16) == 65024:
-                    #if (b6 != 'FF'):
-                    #    GenPhaseBFrequency = int(b6 + b5, 16) * 0.0078125
-                    #    print("SPN-2437 Generator Phase B Frequency :{}".format(GenPhaseBFrequency))
+                    if (b6 != 'FF'):
+                        GenPhaseBFrequency = int(b6 + b5, 16) * 0.0078125
+                        print("SPN-2437 Generator Phase B Frequency :{}".format(GenPhaseBFrequency))
+                    else:
+                        GenPhaseBFrequency=None
                     if (b2 != 'FF'):
                         GenPhaseBL2LV = int(b2+b1,16)
                         print("SPN-2442,Generator Phase B Line - Line AC RMS Voltage :{}".format(GenPhaseBL2LV),file=text_file)
@@ -434,37 +615,47 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         GenPhaseBCurrent = int(b8+b7,16)
                         print("SPN-2450,Generator Phase B AC RMS Current :{}".format(GenPhaseBCurrent),file=text_file)
                         temp.setpgnspn(65024, 2450)
+
+                        temp.add_PhaseB(GenPhaseBCurrent, GenPhaseBFrequency, GenPhaseBL2LV, GenPhaseBL2NV, Timestamp)
+
+
                 elif int(PGN,16) == 65021:
-                    # if (b6 != 'FF'):
-                    #    GenPhaseBFrequency = int(b6 + b5, 16) * 0.0078125
-                    #    print("SPN-2437 Generator Phase B Frequency :{}".format(GenPhaseBFrequency))
-                    if (b2 != 'FF'):
+                     if (b6 != 'FF'):
+                        GenPhaseCFrequency = int(b6 + b5, 16) * 0.0078125
+                        print("SPN-2437 Generator Phase B Frequency :{}".format(GenPhaseCFrequency))
+                     else:
+                         GenPhaseCFrequency = None
+                     if (b2 != 'FF'):
                         GenPhaseCL2LV = int(b2 + b1, 16)
                         print("SPN-2443,Generator Phase C Line - Line AC RMS Voltage :{}".format(GenPhaseCL2LV),file=text_file)
                         temp.setpgnspn(65021, 2443)
-                    if (b2 != 'FF'):
+                     if (b2 != 'FF'):
                         GenPhaseCL2NV = int(b4 + b3, 16)
                         print("SPN-2447,Generator Phase C Line - Neutral AC RMS Voltage :{}".format(GenPhaseCL2NV),file=text_file)
                         temp.setpgnspn(65021, 2447)
-                    if (b8 != 'FF'):
+                     if (b8 != 'FF'):
                         GenPhaseCCurrent = int(b8 + b7, 16)
                         print("SPN-2451,Generator Phase C AC RMS Current :{}".format(GenPhaseCCurrent),file=text_file)
                         temp.setpgnspn(65021, 2451)
+
+                        temp.add_PhaseC(GenPhaseCCurrent, GenPhaseCFrequency, GenPhaseCL2LV, GenPhaseCL2NV, Timestamp)
+
+
                 elif int(PGN,16) == 65263:
-                    if (b4 != 'FF'):
+                     if (b4 != 'FF'):
                         EngineOilPressure = int(b4,16)* 4
                         if EngineOilPressure == 1016:
                             EngineOilPressure = 0
                         print("SPN-100,Engine Oil Pressure :{}".format(EngineOilPressure),file=text_file)
                         temp.add_engoilpressure(EngineOilPressure,Timestamp)
                         temp.setpgnspn(65263, 100)
-                #check spn
+                #check spn as this is proprietary
                 elif int(PGN, 16) == 65282:
-                    if (b5 != 'FF'):
+                     if (b5 != 'FF'):
                         EngineCoolantTemp = int(b5, 16)
                         print("SPN-110,EIC Coolant Temperature :{}".format(EngineCoolantTemp),file=text_file)
                         temp.setpgnspn(65282, 110)
-                    if (b5 != 'FF'):
+                     if (b5 != 'FF'):
                         EngineCoolantTemp = int(b7, 16) * 8
                         print("SPN-110,EIC Engine Oil Pressure :{}".format(EngineCoolantTemp),file=text_file)
                         temp.setpgnspn(65282, 110)
@@ -475,55 +666,55 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         print("SPN-3567,EIC Generator Set to auto control :{}".format(GenControl[5:6]),file=text_file)
                         temp.setpgnspn(64915, 3567)
                     if (b2 != 'FF'):
-                        AltEffeciency = int(b3+b2, 16)
+                        AltEffeciency = int(b3+b2, 16) *0.0025
                         print("SPN-4078,Alternator Effeciency :{}".format(AltEffeciency),file=text_file)
                         temp.setpgnspn(64915, 4078)
                 elif int(PGN, 16) == 65270:
                     if (b1 != 'FF'):
-                        EngPartInletPressure = int(b1, 16)
+                        EngPartInletPressure = int(b1, 16) *0.5
                         print("SPN-81,Engine Particulate Trap Inlet Pressure :{}".format(EngPartInletPressure),file=text_file)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 81)
                     if (b2 != 'FF'):
-                        EngineIntakeManifoldPressure = int(b2, 16)
-                        if EngineIntakeManifoldPressure==254:
+                        EngineIntakeManifoldPressure = int(b2, 16) * 2
+                        if EngineIntakeManifoldPressure > 500:
                             EngineIntakeManifoldPressure=0
                         print("SPN-102,Engine Intake Manifold #1 Pressure :{}".format(EngineIntakeManifoldPressure),file=text_file)
                         temp.add_engmanifoldpressure(EngineIntakeManifoldPressure,Timestamp)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 102)
                     if (b3 != 'FF'):
-                        EngineIntakeManifoldTemperature = int(b3, 16)
-                        if EngineIntakeManifoldTemperature==254:
+                        EngineIntakeManifoldTemperature = int(b3, 16) - 40
+                        if EngineIntakeManifoldTemperature > 210:
                             EngineIntakeManifoldTemperature=0
                         print("SPN-105,Engine Intake Manifold #1 Temperature :{}".format(EngineIntakeManifoldTemperature),file=text_file)
                         temp.add_engmanifoldtemperature(EngineIntakeManifoldTemperature,Timestamp)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 105)
                     if (b4 != 'FF'):
-                        EngineAirInletPressure = int(b4, 16)
+                        EngineAirInletPressure = int(b4, 16) * 2
                         print("SPN-106,Engine Air Inlet Pressure :{}".format(EngineAirInletPressure),file=text_file)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 106)
                     if (b5 != 'FF'):
-                        EngineAirInletDifferenetialPressure = int(b5, 16)
+                        EngineAirInletDifferenetialPressure = int(b5, 16) * 2
                         print("SPN-107,Engine Air Differential Pressure :{}".format(EngineAirInletDifferenetialPressure),file=text_file)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 107)
                     if (b7 != 'FF'):
-                        EngineExhaustGasTemp = int(b7+b6, 16)
+                        EngineExhaustGasTemp = (int(b7+b6, 16) * 0.03125) - 273
                         print("SPN-173,Engine Exhaust Gas Temperature :{}".format(EngineExhaustGasTemp),file=text_file)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 173)
                     if (b8 != 'FF'):
-                        EngineCoolantDifferenetialPressure = int(b8, 16)
+                        EngineCoolantDifferenetialPressure = int(b8, 16) * 0.5
                         print("SPN-112,Engine Coolant Differential Pressure :{}".format(EngineCoolantDifferenetialPressure),file=text_file)
-                        temp.setpgnspn(65270, 2440)
+                        temp.setpgnspn(65270, 112)
                 elif int(PGN, 16) == 64934:
                     if (b1 != 'FF'):
-                        GenExcitationFV = int(b2+b1, 16) - 3212.75
+                        GenExcitationFV = (int(b2+b1, 16)*0.05) - 1606
                         print("SPN-3380,Generator Excitation Field Voltage :{}".format(GenExcitationFV),file=text_file)
                         temp.setpgnspn(64934, 3380)
                     if (b3 != 'FF'):
-                        GenExcitationFC = int(b4+b3, 16)
+                        GenExcitationFC = int(b4+b3, 16) * 0.05
                         print("SPN-3381,Generator Excitation Field Current :{}".format(GenExcitationFC),file=text_file)
                         temp.setpgnspn(64934, 3381)
                     if (b5 != 'FF'):
-                        GenOutputVbiasPercentage = (int(b6+b5, 16) * 0.1 ) - 3212.75
+                        GenOutputVbiasPercentage = (int(b6+b5, 16) * 0.1 )
                         print("SPN-3382,Generator Output Voltage Bias Percentage :{}".format(GenOutputVbiasPercentage),file=text_file)
                         temp.setpgnspn(64934, 3382)
                 elif int(PGN, 16) == 65266:
@@ -580,7 +771,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                 elif int(PGN, 16) == 65253:
                     if (b1 != 'FF'):
                         EngineHours = int(b4+b3+b2+b1, 16) * 0.05
-                        print("SPN-247,Engine Air Filter Differential 2 :{}".format(EngineHours),file=text_file)
+                        print("SPN-247,Engine Hours :{}".format(EngineHours),file=text_file)
                         temp.setpgnspn(64976, 2809)
 
                 else:
