@@ -345,6 +345,7 @@ class parser_summary:
             print("PGN and associated byte changes {}".format(set(self.pgn_byte_list)),file=text_file)
 
             print(" SPN List : {}".format(set(self.spn_list)),file=text_file)
+            print("{},{}".format(filename[0] ,set(self.spn_list)))
 
             for i in self.pgn_byte_list:
                 totalpgnbytelist.append(i)
@@ -934,7 +935,7 @@ for filename in os.listdir(LogFilesDir):
                         parseJ1939(data,filename[0],newfile_flag,temp)
             lno = lno+1
             newfile_flag=0
-        temp.plot_graph()
+        # temp.plot_graph()
     except  Exception:
        print (filename[0] +" could not be parsed")
 print(set(totalpgnbytelist))
