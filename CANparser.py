@@ -16,6 +16,8 @@ class parser_summary:
         self.spn_list = []
         self.speed_timestamp = []
         self.speed_value = []
+        self.boostpressure_value = []
+        self.boostpressure_timestamp = []
         self.engoilpressure_value = []
         self.engoilpressure_timestamp = []
         self.engcoolanttemp_value = []
@@ -66,6 +68,14 @@ class parser_summary:
         else:
             self.engoilpressure_value.append(value)
             self.engoilpressure_timestamp.append(timestamp)
+
+    def add_boostpressure (self,value,timestamp):
+
+        if len(self.boostpressure_value) > 0 and timestamp == self.boostpressure_timestamp[-1]:
+            pass
+        else:
+            self.boostpressure_value.append(value)
+            self.boostpressure_timestamp.append(timestamp)
 
     def add_engcoolanttemp (self,value,timestamp):
 
@@ -160,6 +170,7 @@ class parser_summary:
         arrangedfulerate_value = []
         arrangedengmanifoldpressure_value = []
         arrangedengoilpressure_value = []
+        arrangedboostpressure_value = []
         arrangedengcoolanttemp_value = []
         arrangedGenAvgL2LV = []
         arrangedGenAvgL2NV = []
@@ -195,6 +206,12 @@ class parser_summary:
             if i in self.speed_timestamp:
                 cursor=self.speed_timestamp.index(i)
                 arrangedspeed_value.append(self.speed_value[cursor])
+            else :
+                arrangedspeed_value.append(None)
+
+            if i in self.boostpressure_timestamp:
+                cursor=self.boostpressure_timestamp.index(i)
+                arrangedboostpressure_value.append(self.boostpressure_value[cursor])
             else :
                 arrangedspeed_value.append(None)
 
@@ -279,6 +296,7 @@ class parser_summary:
         print (arrangedengcoolanttemp_value)
         print (arrangedengoilpressure_value)
         print (arrangedengmanifoldpressure_value)
+        print (arrangedboostpressure_value)
         print (arrangedfulerate_value)
         print (len(sortedtimestamp))
         line_chart = pygal.Line()
@@ -288,6 +306,7 @@ class parser_summary:
         line_chart.add('Eng coolant temp',arrangedengcoolanttemp_value)
         line_chart.add('Eng Oil Pressure',arrangedengoilpressure_value)
         line_chart.add('Manifold Pressure',arrangedengmanifoldpressure_value)
+        line_chart.add('Boost Pressure',arrangedboostpressure_value)
         line_chart.add('Fuel Rate',arrangedfulerate_value)
 
         line_chart.render_to_file(currentWorkingDir+'/ChartFiles/'+self.instance_filename+'Combined.svg')
@@ -780,6 +799,13 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         EngineHours = int(b4+b3+b2+b1, 16) * 0.05
                         print("SPN-247,Engine Hours :{}".format(EngineHours),file=text_file)
                         temp.setpgnspn(64976, 2809)
+
+                elif int(PGN, 16) == 65190:
+                    if (b1 != 'FF'):
+                        BoostPressure = int(b2+b1, 16) * 0.05
+                        print("SPN- 1127 Boost Pressure:{}".format(BoostPressure),file=text_file)
+                        temp.add_boostpressure(BoostPressure, Timestamp)
+                        temp.setpgnspn(65190, 1127)
 
                 else:
                     if (int(PGN,16)):
