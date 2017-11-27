@@ -798,7 +798,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                     if (b1 != 'FF'):
                         EngineHours = int(b4+b3+b2+b1, 16) * 0.05
                         print("SPN-247,Engine Hours :{}".format(EngineHours),file=text_file)
-                        temp.setpgnspn(64976, 2809)
+                        temp.setpgnspn(65253, 247)
 
                 elif int(PGN, 16) == 65190:
                     if (b1 != 'FF'):
