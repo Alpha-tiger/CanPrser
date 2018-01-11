@@ -1,6 +1,9 @@
 import os,subprocess
 import pygal
-
+import pandas as pd
+import numpy as np
+totalpgnlist = pd.read_csv('list.csv', header=None, index_col=0, squeeze=True, dtype={'1':np.int32}).to_dict()
+print(totalpgnlist)
 
 totalpgnbytelist = []
 
@@ -193,7 +196,7 @@ class parser_summary:
 
 
 
-        print ("reached plot graph")
+        # print ("reached plot graph")
         currentWorkingDir = os.getcwd()
 
         timestamp = set(self.speed_timestamp+self.engcoolanttemp_timestamp+self.engoilpressure_timestamp+self.engmanifoldpressure_timestamp+self.fulerate_timestamp+self.GenAvgTimestamp+self.GenPhaseATimestamp+self.GenPhaseBTimestamp+self.GenPhaseCTimestamp)
@@ -291,14 +294,14 @@ class parser_summary:
 
 
 
-        print("data vs time")
-        print (arrangedspeed_value)
-        print (arrangedengcoolanttemp_value)
-        print (arrangedengoilpressure_value)
-        print (arrangedengmanifoldpressure_value)
-        print (arrangedboostpressure_value)
-        print (arrangedfulerate_value)
-        print (len(sortedtimestamp))
+        # print("data vs time")
+        # print (arrangedspeed_value)
+        # print (arrangedengcoolanttemp_value)
+        # print (arrangedengoilpressure_value)
+        # print (arrangedengmanifoldpressure_value)
+        # print (arrangedboostpressure_value)
+        # print (arrangedfulerate_value)
+        # print (len(sortedtimestamp))
         line_chart = pygal.Line()
         line_chart.title = "Generator - Data vs Time"
         line_chart.x_labels = sortedtimestamp
@@ -396,7 +399,9 @@ class parser_summary:
         if b8 != 'FF':
             hb8 = '1'
 
-        self.pgn_byte_list.append("PGN-{},{}{}{}{}{}{}{}{}".format(pgn,hb1,hb2,hb3,hb4,hb5,hb6,hb7,hb8))
+        if int(PGN) in totalpgnlist.keys():
+            descp = totalpgnlist.get(PGN)
+            self.pgn_byte_list.append("PGN-{},{},{}{}{}{}{}{}{}{}".format(pgn,descp,hb1,hb2,hb3,hb4,hb5,hb6,hb7,hb8))
 
 
 #creating a library to store all PGN numbers
@@ -427,7 +432,6 @@ J1939 = {64914: "Engine Operating Information",
          65247: "Electronic Engine Controller 3",
          65170: "Engine Information",
          64976: "Inlet / Exhaust Conditions 2",
-         59904: "Request"
          }
 
 
@@ -541,7 +545,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         print("SPN-513,Actual Engine Percentage Torque :{}".format(ActualEnginePT),file=text_file)
                         temp.setpgnspn(61444, 513)
                     if (b2 != 'FF'):
-                        DriveDemandPT = int(b2,16)
+                        DriveDemandPT = int(b2,16) - 125
                         print("SPN-512,Driver Demand Percentage Torque :{}".format(DriveDemandPT),file=text_file)
                         temp.setpgnspn(61444, 512)
                     if (b8 != 'FF') :
@@ -554,7 +558,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         print("SPN-3357,Actual Maximum Available Engine - Percent Torque :{}".format(ActualMaxAvaialablePerTorque),file=text_file)
                         temp.setpgnspn(61443, 3357)
                     if (b3 != 'FF'):
-                        EnginePercentLoadCurrentSpeed = int(b3,16) - 125
+                        EnginePercentLoadCurrentSpeed = int(b3,16)
                         print("SPN-92,Engine % Load at current Speed :{}".format(EnginePercentLoadCurrentSpeed),file=text_file)
                         temp.setpgnspn(61443, 92)
                     if (b2 != 'FF'):
@@ -935,7 +939,7 @@ for filename in os.listdir(LogFilesDir):
                         parseJ1939(data,filename[0],newfile_flag,temp)
             lno = lno+1
             newfile_flag=0
-        # temp.plot_graph()
+        temp.plot_graph()
     except  Exception:
        print (filename[0] +" could not be parsed")
-print(set(totalpgnbytelist))
+    print(set(totalpgnbytelist))
