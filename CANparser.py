@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 totalpgnlist = pd.read_csv('list.csv', header=None, index_col=0, squeeze=True, dtype={'1':np.int32}).to_dict()
 print(totalpgnlist)
+totalspnlist = pd.read_csv('SPNList.csv', header=None, index_col=0, squeeze=True, dtype={'1':np.int32}).to_dict()
+print(totalspnlist)
 
 totalpgnbytelist = []
 
@@ -55,6 +57,8 @@ class parser_summary:
         self.GenPhaseCL2NV = []
         self.GenPhaseCCurrent = []
         self.GenPhaseCTimestamp = []
+        self.EngineTotalFuelUsed_value = []
+        self.EngineTotalFuelUsed_timestamp = []
 
     def add_speed (self,speed,timestamp):
 
@@ -111,6 +115,14 @@ class parser_summary:
         else:
             self.fulerate_value.append(value)
             self.fulerate_timestamp.append(timestamp)
+
+    def add_EngineTotalFuelUsed(self,value,timestamp):
+
+        if len(self.fulerate_value) > 0 and timestamp == self.fulerate_timestamp[-1]:
+            pass
+        else:
+            self.EngineTotalFuelUsed_value.apped(value)
+            self.EngineTotalFuelUsed_timestamp.append(timestamp)
 
     def add_GenAvg (self,current,frequency,l2l,l2n,timestamp):
 
@@ -343,12 +355,20 @@ class parser_summary:
             self.set_pgnlist = set(self.pgn_list)
             print("PGN List : {}".format(self.set_pgnlist),file=text_file)
             for i in self.set_pgnlist:
+
                 print ("{} occurs {} times".format(i,self.pgn_list.count(i)),file=text_file)
 
             print("PGN and associated byte changes {}".format(set(self.pgn_byte_list)),file=text_file)
 
             print(" SPN List : {}".format(set(self.spn_list)),file=text_file)
-            print("{},{}".format(filename[0] ,set(self.spn_list)))
+
+
+            print(" Information for {}".format(filename[0]))
+
+            for i in set(self.spn_list):
+                if i in totalspnlist.keys():
+                    descp = totalspnlist.get(i)
+                    print("{}:{}".format(i,descp))
 
             for i in self.pgn_byte_list:
                 totalpgnbytelist.append(i)
@@ -432,6 +452,7 @@ J1939 = {64914: "Engine Operating Information",
          65247: "Electronic Engine Controller 3",
          65170: "Engine Information",
          64976: "Inlet / Exhaust Conditions 2",
+         65257: "Fuel Consumption (Liquid) 1"
          }
 
 
@@ -811,6 +832,13 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         print("SPN- 1127 Boost Pressure:{}".format(BoostPressure),file=text_file)
                         temp.add_boostpressure(BoostPressure, Timestamp)
                         temp.setpgnspn(65190, 1127)
+
+                elif int(PGN, 16) == 65257:
+                    if (b1 != 'FF'):
+                        EngineTotalFuelUsed = int(b8+b7+b6+b5, 16) * 0.5
+                        print("SPN-250 Engine Total Fuel Used:{}".format(EngineTotalFuelUsed),file=text_file)
+                        temp.add_EngineTotalFuelUsed(EngineTotalFuelUsed, Timestamp)
+                        temp.setpgnspn(65257, 250)
 
                 else:
                     if (int(PGN,16)):
