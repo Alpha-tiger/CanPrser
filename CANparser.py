@@ -2,6 +2,15 @@ import os,subprocess
 import pygal
 import pandas as pd
 import numpy as np
+import sqlite3 as lite
+import sys
+
+
+
+
+
+
+
 totalpgnlist = pd.read_csv('list.csv', header=None, index_col=0, squeeze=True, dtype={'1':np.int32}).to_dict()
 print(totalpgnlist)
 totalspnlist = pd.read_csv('SPNList.csv', header=None, index_col=0, squeeze=True, dtype={'1':np.int32}).to_dict()
@@ -845,7 +854,7 @@ def parseJ1939(rawdata,filename,newfile_flag,temp):
                         print("PGN in hex is {0} in decimal {1}, not found".format(PGN,int(PGN,16)),file=text_file)
             else :
              if (int(PGN, 16)):
-                print ("PGN {} Not found, values are ".format(int(Header[2:6],16)),Values,file=text_file)
+                print ("PGN {} Not found, values are ".format((int(PGN, 16),16)),Values,file=text_file)
     return;
 
 
