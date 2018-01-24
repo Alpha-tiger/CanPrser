@@ -17,6 +17,30 @@ totalspnlist = pd.read_csv('SPNList.csv', header=None, index_col=0, squeeze=True
 print(totalspnlist)
 
 totalpgnbytelist = []
+total_available_spn = []
+
+
+def get_spn(pgn, bytespos):
+    db_name = 'j1939v2.db'
+    con = lite.connect(db_name)
+
+    with con:
+        i=None
+        cur = con.cursor()
+        statement = "SELECT SPN FROM PGN WHERE PGN=" + str(pgn) + " and BytePosition=" + str(bytespos)
+        cur.execute(statement)
+
+        rows = cur.fetchall()
+
+        for row in rows:
+            # print (row[0])
+            i = row[0]
+
+        if(i):
+            return (i)
+        else:
+            return None
+
 
 class parser_summary:
     instance_filename = 'empty'
@@ -26,6 +50,7 @@ class parser_summary:
 
     def __init__(self,filename):
         self.instance_filename = filename
+        self.total_spn_available= []
         self.pgn_list = []
         self.spn_list = []
         self.speed_timestamp = []
@@ -187,6 +212,9 @@ class parser_summary:
             self.GenPhaseCL2LV.append(l2l)
             self.GenPhaseCL2NV.append(l2n)
             self.GenPhaseCTimestamp.append(timestamp)
+
+
+
 
     def plot_graph(self):
 
@@ -382,6 +410,9 @@ class parser_summary:
             for i in self.pgn_byte_list:
                 totalpgnbytelist.append(i)
 
+            for i in self.total_spn_available:
+                total_available_spn.append(i)
+
     def readfilename(self):
         return self.instance_filename
 
@@ -430,7 +461,8 @@ class parser_summary:
 
         if int(PGN) in totalpgnlist.keys():
             descp = totalpgnlist.get(PGN)
-            self.pgn_byte_list.append("PGN-{},{},{}{}{}{}{}{}{}{}".format(pgn,descp,hb1,hb2,hb3,hb4,hb5,hb6,hb7,hb8))
+            descp = descp.replace(',','')
+            self.pgn_byte_list.append("{},{},{},{},{},{},{},{},{},{}".format(pgn,descp,hb1,hb2,hb3,hb4,hb5,hb6,hb7,hb8))
 
 
 #creating a library to store all PGN numbers
@@ -977,6 +1009,31 @@ for filename in os.listdir(LogFilesDir):
             lno = lno+1
             newfile_flag=0
         temp.plot_graph()
+
     except  Exception:
-       print (filename[0] +" could not be parsed")
-    print(set(totalpgnbytelist))
+       if filename[0] is not "D":
+        print (filename[0] +" could not be parsed")
+
+    if filename[0] is not "D":
+        print(set(totalpgnbytelist))
+        for i in set(totalpgnbytelist):
+            line_split = str(i)
+            csvline=line_split.split(",")
+            print(csvline)
+            pgn = csvline[0]
+            for i in range(2,9):
+                if csvline[i] == '1':
+                    byte=(int(i)-1)
+                    # print ("{},{}".format(pgn,byte))
+                    spn=get_spn(pgn,byte)
+                    if (spn):
+                        # print(spn)
+                        total_available_spn.append(spn)
+        # print(set(total_available_spn))
+        print ("Total possible SPN for {} are as follows".format(filename[0]))
+        for i in set(total_available_spn):
+            if i in totalspnlist.keys():
+                descp = totalspnlist.get(i)
+                print("{}:{}".format(i, descp))
+
+        print ("***********************************************************************************************************")

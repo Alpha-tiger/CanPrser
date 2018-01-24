@@ -4,8 +4,32 @@ import csv
 import pandas as pd
 import numpy as np
 
+db_name = 'j1939v2.db'
 
 # function to create the database
+
+
+
+def get_spn2(pgn, bytespos):
+    db_name = 'j1939v2.db'
+    con = lite.connect(db_name)
+
+    with con:
+        i=None
+        cur = con.cursor()
+        statement = "SELECT SPN FROM PGN WHERE PGN=" + str(pgn) + " and BytePosition=" + str(bytespos)
+        cur.execute(statement)
+
+        rows = cur.fetchall()
+
+        for row in rows:
+            # print (row[0])
+            i = row[0]
+
+        if(i):
+            return (i)
+        else:
+            return None
 
 def save2db(db_name):
     try:
@@ -19,9 +43,9 @@ def save2db(db_name):
 
             cur = con.cursor()
 
-            cur.execute("CREATE TABLE PGN(Id INT, PGN INT, PF INT, BytePosition INT, SPN INT)")
+            cur.execute("CREATE TABLE PGN(Id INT, PGN INT, PGNDATASIZE INT, BytePosition INT, SPN INT)")
 
-            with open('PGNSPNCALCDICT.csv', newline='') as csvfile:
+            with open('newdictionary.csv', newline='') as csvfile:
                 linereader = csv.reader(csvfile)
                 line =1
                 for row in linereader:
@@ -51,12 +75,13 @@ def save2db(db_name):
 def get_spn(pgn,bytespos):
 
     query = "write the query"
-
+    db_name = 'j1939v2.db'
     con = lite.connect(db_name)
 
     with con:
         cur = con.cursor()
-        cur.execute("SELECT SPN FROM PGN WHERE PGN=65266 and BytePosition=4")
+        statement="SELECT SPN FROM PGN WHERE PGN="+str(pgn)+" and BytePosition="+str(bytespos)
+        cur.execute(statement)
 
         rows = cur.fetchall()
 
@@ -65,19 +90,16 @@ def get_spn(pgn,bytespos):
             i=row[0]
             if i in totalspnlist.keys():
                 descp = totalspnlist.get(i)
-                print("{}:{}".format(i, descp))
+                return ((i, descp))
 
-
-    result = 256
-
-    return result
-
-
+    con.close()
 
 #declare databasename
-db_name= 'j1939v1.db'
+db_name= 'j1939v2.db'
 # calling the createdatabase function
-#save2db(db_name)
+# save2db(db_name)
 totalspnlist = pd.read_csv('SPNList.csv', header=None, index_col=0, squeeze=True, dtype={'1':np.int32}).to_dict()
 
-ans=get_spn(0,2)
+ans1=get_spn2(65253,1)
+
+print (ans1)
